@@ -1,5 +1,5 @@
 #! /bin/perl
-# pt-what: This tool will tell you which percona tool will you use for your task of choice.
+# pt-what: This tool will tell you which percona tool you can use for your task of choice.
 # By Kedar Vaijanapurkar @ http://kedar.nitty-witty.com/blog
 
 my $check_tool = $ARGV[0];
