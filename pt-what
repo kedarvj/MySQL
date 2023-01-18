@@ -2,52 +2,75 @@
 # pt-what: This tool will tell you which percona tool you can use for your task of choice.
 # By Kedar Vaijanapurkar @ http://kedar.nitty-witty.com/blog
 
-my $check_tool = $ARGV[0];
-print "----------------------------------------------------------\n";
-print "Checking percona tool for: $check_tool";
-print "\n";
-print "----------------------------------------------------------\n";
+use strict;
+use warnings;
 
-my $pt_align = "aligns output from other tools to columns.";
-my $pt_archiver = "Archive rows from a MySQL table into another table or a file. Purge data.";
-my $pt_config_diff = "Diff MySQL configuration files and server variables.";
-my $pt_deadlock_logger = "Log MySQL deadlocks.";
-my $pt_diskstats = "prints disk I/O statistics for GNU/Linux. It is somewhat similar to iostat, but it is interactive and more detailed. It can analyze samples gathered from another machine.";
-my $pt_duplicate_key_checker = "examines MySQL tables for duplicate or redundant indexes and foreign keys.";
-my $pt_fifo_split = "Split files and pipe lines to a fifo without really splitting.";
-my $pt_find = "Find MySQL tables and execute actions, like GNU find.";
-my $pt_fingerprint = "Convert queries into fingerprints.";
-my $pt_fk_error_logger = "Log MySQL foreign key errors.";
-my $pt_heartbeat = "Monitor MySQL replication delay.";
-my $pt_index_usage = "Read queries from a log and analyze how they use indexes.";
-my $pt_ioprofile = "Watch process IO and print a table of file and I/O activity.";
-my $pt_kill = "Kill MySQL queries that match certain criteria.";
-my $pt_mext = "Look at many samples of MySQL SHOW GLOBAL STATUS side-by-side.";
-my $pt_mongodb_query_digest = "Reports query usage statistics by aggregating queries from MongoDB query profiler.";
-my $pt_mongodb_summary = "collects information about a MongoDB cluster. It collects information from several sources to provide an overview of the cluster.";
-my $pt_mysql_summary = "Summarize MySQL information nicely.";
-my $pt_online_schema_change = "ALTER tables without locking them.";
-my $pt_pmp = "Aggregate GDB stack traces for a selected program.";
-my $pt_query_digest = "Analyze MySQL queries from logs, processlist, and tcpdump.";
-my $pt_secure_collect = "Collect, sanitize, pack and encrypt data.";
-my $pt_show_grants = "Canonicalize and print MySQL grants so you can effectively replicate, compare and version-control them.";
-my $pt_sift = "Browses files created by pt-stalk.";
-my $pt_slave_delay = "Make a MySQL slave server lag behind its master.";
-my $pt_slave_find = "Find and print replication hierarchy tree of MySQL slaves.";
-my $pt_slave_restart = "Watch and restart MySQL replication after errors.";
-my $pt_stalk = "Collect forensic data about MySQL when problems occur.";
-my $pt_summary = "Summarize system information nicely.";
-my $pt_table_checksum = "Verify MySQL replication integrity.";
-my $pt_table_sync = "Synchronize MySQL table data efficiently.";
-my $pt_table_usage = "Analyze how queries use tables.";
-my $pt_upgrade = "Verify that query results are identical on different servers.";
-my $pt_variable_advisor = "Analyze MySQL variables and advise on possible problems.";
-my $pt_visual_explain = "Format EXPLAIN output as a tree.";
+my %tools = (
+    "pt-archiver" => "Moves data from online tables to archive storage, backup data, archive data, archive and backup",
+    "pt-config-diff" => "Compares the configuration of two servers, configuration comparison, global variables comparison",
+    "pt-deadlock-logger" => "Monitors and logs deadlocks, save deadlocks, monitor deadlock, deadlock monitor",
+    "pt-diskstats" => "Shows disk usage by table and index",
+    "pt-duplicate-key-checker" => "Checks for duplicate keys in a table",
+    "pt-fifo-split" => "Splits a FIFO file into multiple files",
+    "pt-find" => "Searches for patterns in files",
+    "pt-fingerprint" => "Shows the fingerprints of queries",
+    "pt-flush-status" => "Shows the status of active and queued flushes",
+    "pt-fk-error-logger" => "Monitors and logs foreign key errors",
+    "pt-heartbeat" => "Creates a timestamp in a table",
+    "pt-index-usage" => "Shows index usage statistics",
+    "pt-kill" => "Kills queries",
+    "pt-log-player" => "Replays queries from a log file",
+    "pt-mext" => "Merges the contents of two tables",
+    "pt-mongodb-query-digest" => "Analyzes MongoDB query performance",
+    "pt-mysql-summary" => "Summarizes performance metrics for MySQL servers, database summary, MySQL Summary, ",
+    "pt-online-schema-change" => "Performs online schema changes, dummy alter, almost zero downtime alter, no lock alter",
+    "pt-opus" => "Shows the opcodes of queries",
+    "pt-pmp" => "Manages a pool of MySQL servers",
+    "pt-query-digest" => "Analyzes MySQL query performance",
+    "pt-show-grants" => "Shows grants for all users",
+    "pt-sift" => "Analyses a MySQL slow query log",
+    "pt-slave-delay" => "Sets the replication delay for a slave server",
+    "pt-slave-find" => "Finds the most lagging slave",
+    "pt-slave-restart" => "Restarts a slave server",
+    "pt-stalk" => "Watches for and diagnoses replication problems",
+    "pt-summary" => "Summarizes information about the system and queries",
+    "pt-table-checksum" => "Checks the replication consistency of tables",
+    "pt-table-sync" => "Synchronizes the data of two tables",
+    "pt-table-usage" => "Shows table usage statistics",
+    "pt-upgrade" => "Upgrades Percona Toolkit",
+    "pt-variable-advisor" => "Advises on the use of MySQL system variables",
+    "pt-visual-explain" => "Visualizes EXPLAIN output"
+);
+
+sub show_random_tool {
+    my @keys = keys %tools;
+    my $random_tool = $keys[rand @keys];
+    print "FYI: The '$random_tool' can be used for: $tools{$random_tool}\n";
+}
 
 
-@tools = qw($pt_align $pt_archiver $pt_config_diff $pt_deadlock_logger $pt_diskstats $pt_duplicate_key_checker $pt_fifo_split $pt_find $pt_fingerprint $pt_fk_error_logger $pt_heartbeat $pt_index_usage $pt_ioprofile $pt_kill $pt_mext $pt_mongodb_query_digest $pt_mongodb_summary $pt_mysql_summary $pt_online_schema_change $pt_pmp $pt_query_digest $pt_secure_collect $pt_show_grants $pt_sift $pt_slave_delay $pt_slave_find $pt_slave_restart $pt_stalk $pt_summary $pt_table_checksum $pt_table_sync $pt_table_usage $pt_upgrade $pt_variable_advisor $pt_visual_explain);
-foreach $tool (@tools) {
-  if (index(lc(eval "$tool"), lc("$check_tool")) != -1) {
-    print "$tool \n";
-  }
+my $task = shift @ARGV;
+if (!defined $task) {
+    print "Error: No task specified.\n";
+    &show_random_tool;
+    exit 0;
+}
+
+
+print "\nPercona tools that may assist you with '$task' task:\n";
+print "-------------------------------------------------\n";
+my $matching_tools = 0;
+foreach my $tool (keys %tools) {
+    if ($tools{$tool} =~ /$task/i) {
+        print "$tool\n";
+        $matching_tools++;
+    }
+}
+
+if($matching_tools==0) {
+    print "No matching tools found for the task '$task'\n\n";
+    &show_random_tool;
+} else {
+    print "\nTo download above tools use the following command:\n";
+    print "wget percona.com/get/[TOOLNAME] && chmod +x [TOOLNAME]\n";
 }
