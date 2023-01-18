@@ -1,6 +1,10 @@
 #! /bin/perl
+
 # pt-what: This tool will tell you which percona tool you can use for your task of choice.
+# Version 2.0
 # By Kedar Vaijanapurkar @ http://kedar.nitty-witty.com/blog
+# MIT License 
+# ToDo: improvbe the task list
 
 use strict;
 use warnings;
