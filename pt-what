@@ -52,6 +52,16 @@ sub show_random_tool {
     print "FYI: The '$random_tool' can be used for: $tools{$random_tool}\n";
 }
 
+sub help {
+    print "Usage: pt-what <task>\n";
+    print "Search for Percona tools that can help with the specified task.\n\n";
+    print "Options:\n";
+    print "  task         Task to search for Percona tools for\n";
+    print "  -h, --help   Show this help message\n";
+    exit;
+}
+
+
 my $task = shift @ARGV or help();
 
 if ($task eq "-h" || $task eq "--help") {
