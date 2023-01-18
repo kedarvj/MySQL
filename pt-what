@@ -52,14 +52,18 @@ sub show_random_tool {
     print "FYI: The '$random_tool' can be used for: $tools{$random_tool}\n";
 }
 
+my $task = shift @ARGV or help();
 
-my $task = shift @ARGV;
+if ($task eq "-h" || $task eq "--help") {
+    help();
+}
+
 if (!defined $task) {
     print "Error: No task specified.\n";
+    help();
     &show_random_tool;
     exit 0;
 }
-
 
 print "\nPercona tools that may assist you with '$task' task:\n";
 print "-------------------------------------------------\n";
