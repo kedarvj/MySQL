@@ -91,4 +91,5 @@ if($matching_tools==0) {
 } else {
     print "\nTo download above tools use the following command:\n";
     print "wget percona.com/get/[TOOLNAME] && chmod +x [TOOLNAME]\n";
+    print "Install Percona Toolkit: https://docs.percona.com/percona-toolkit/installation.html\n"
 }
