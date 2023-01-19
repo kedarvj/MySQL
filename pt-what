@@ -1,9 +1,11 @@
+#!/usr/bin/perl
+
 #! /bin/perl
 
 # pt-what: This tool will tell you which percona tool you can use for your task of choice.
-# Version 2.0
+# Version 2.1
 # By Kedar Vaijanapurkar @ http://kedar.nitty-witty.com/blog
-# MIT License 
+# MIT License
 # ToDo: improvbe the task list
 
 use strict;
@@ -27,7 +29,7 @@ my %tools = (
     "pt-mext" => "Merges the contents of two tables",
     "pt-mongodb-query-digest" => "Analyzes MongoDB query performance",
     "pt-mysql-summary" => "Summarizes performance metrics for MySQL servers, database summary, MySQL Summary, ",
-    "pt-online-schema-change" => "Performs online schema changes, dummy alter, almost zero downtime alter, no lock alter, table alter, alter table, table modification, change of column, add new column, index, datatype",
+    "pt-online-schema-change" => "Performs online schema changes, dummy alter, almost zero downtime alter, no lock alter, table alter,fragmentation, disk free,defragment",
     "pt-opus" => "Shows the opcodes of queries",
     "pt-pmp" => "Manages a pool of MySQL servers",
     "pt-query-digest" => "Analyzes MySQL query performance",
@@ -62,31 +64,40 @@ sub help {
 }
 
 
-my $task = shift @ARGV or help();
+my @tasks = @ARGV or help();
 
-if ($task eq "-h" || $task eq "--help") {
+if($tasks[0] eq "-h" || $tasks[0] eq "--help"){
     help();
 }
 
-if (!defined $task) {
+if (!@tasks) {
     print "Error: No task specified.\n";
     help();
     &show_random_tool;
     exit 0;
 }
 
-print "\nPercona tools that may assist you with '$task' task:\n";
+print "\nPercona tools that may assist you with '@tasks' task:\n";
 print "-------------------------------------------------\n";
-my $matching_tools = 0;
-foreach my $tool (keys %tools) {
-    if ($tools{$tool} =~ /$task/i) {
-        print "$tool\n";
-        $matching_tools++;
+
+my %matching_tools;
+
+foreach my $task (@tasks) {
+    foreach my $tool (keys %tools) {
+        if ($tools{$tool} =~ /$task/i) {
+            $matching_tools{$tool}++;
+        }
     }
 }
 
-if($matching_tools==0) {
-    print "No matching tools found for the task '$task'\n\n";
+my @sorted_tools = sort {$matching_tools{$b} <=> $matching_tools{$a}} keys %matching_tools;
+
+foreach my $tool (@sorted_tools) {
+    print "* $tool\n";
+}
+
+if(!@sorted_tools) {
+    print "No matching tools found for the task '@tasks'\n\n";
     &show_random_tool;
 } else {
     print "\nTo download above tools use the following command:\n";
