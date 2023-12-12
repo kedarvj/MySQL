@@ -40,10 +40,10 @@ my %tools = (
     "pt-slave-restart" => "Restarts a slave server",
     "pt-stalk" => "Watches for and diagnoses replication problems",
     "pt-summary" => "Summarizes information about the system and queries",
-    "pt-table-checksum" => "Checks the replication consistency of tables",
+    "pt-table-checksum" => "Checks the replication consistency of tables, table checksum, ",
     "pt-table-sync" => "Synchronizes the data of two tables",
     "pt-table-usage" => "Shows table usage statistics",
-    "pt-upgrade" => "Upgrades Percona Toolkit",
+    "pt-upgrade" => "Upgrade, MySQL Upgrade",
     "pt-variable-advisor" => "Advises on the use of MySQL system variables",
     "pt-visual-explain" => "Visualizes EXPLAIN output"
 );
