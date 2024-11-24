@@ -1,68 +1,149 @@
-#!/usr/bin/perl
-
 #! /bin/perl
 
 # pt-what: This tool will tell you which percona tool you can use for your task of choice.
-# Version 2.1
-# By Kedar Vaijanapurkar @ http://kedar.nitty-witty.com/blog
+# Version 2.3
+# Originally By Kedar Vaijanapurkar @ http://kedar.nitty-witty.com/blog
 # MIT License
-# ToDo: improvbe the task list
 
 use strict;
 use warnings;
 
 my %tools = (
-    "pt-archiver" => "Moves data from online tables to archive storage, backup data, archive data, archive and backup",
-    "pt-config-diff" => "Compares the configuration of two servers, configuration comparison, global variables comparison",
-    "pt-deadlock-logger" => "Monitors and logs deadlocks, save deadlocks, monitor deadlock, deadlock monitor",
-    "pt-diskstats" => "Shows disk usage by table and index",
-    "pt-duplicate-key-checker" => "Checks for duplicate keys in a table",
-    "pt-fifo-split" => "Splits a FIFO file into multiple files",
-    "pt-find" => "Searches for patterns in files",
-    "pt-fingerprint" => "Shows the fingerprints of queries",
-    "pt-flush-status" => "Shows the status of active and queued flushes",
-    "pt-fk-error-logger" => "Monitors and logs foreign key errors",
-    "pt-heartbeat" => "Creates a timestamp in a table",
-    "pt-index-usage" => "Shows index usage statistics",
-    "pt-kill" => "Kills queries",
-    "pt-log-player" => "Replays queries from a log file",
-    "pt-mext" => "Merges the contents of two tables",
-    "pt-mongodb-query-digest" => "Analyzes MongoDB query performance",
-    "pt-mysql-summary" => "Summarizes performance metrics for MySQL servers, database summary, MySQL Summary, ",
-    "pt-online-schema-change" => "Performs online schema changes, dummy alter, almost zero downtime alter, no lock alter, table alter,fragmentation, disk free,defragment",
-    "pt-opus" => "Shows the opcodes of queries",
-    "pt-pmp" => "Manages a pool of MySQL servers",
-    "pt-query-digest" => "Analyzes MySQL query performance",
-    "pt-show-grants" => "Shows grants for all users",
-    "pt-sift" => "Analyses a MySQL slow query log",
-    "pt-slave-delay" => "Sets the replication delay for a slave server",
-    "pt-slave-find" => "Finds the most lagging slave",
-    "pt-slave-restart" => "Restarts a slave server",
-    "pt-stalk" => "Watches for and diagnoses replication problems",
-    "pt-summary" => "Summarizes information about the system and queries",
-    "pt-table-checksum" => "Checks the replication consistency of tables, table checksum, ",
-    "pt-table-sync" => "Synchronizes the data of two tables",
-    "pt-table-usage" => "Shows table usage statistics",
-    "pt-upgrade" => "Upgrade, MySQL Upgrade",
-    "pt-variable-advisor" => "Advises on the use of MySQL system variables",
-    "pt-visual-explain" => "Visualizes EXPLAIN output"
+    "pt-archiver" => "Archives and purges table data efficiently with minimal impact on production. Use for: archiving old data, " .
+                     "data retention management, table cleanup, reducing table size, moving data between servers, backup historical data, " .
+                     "maintaining fixed-size tables, defragmentation, disk space management",
+
+    "pt-config-diff" => "Compare MySQL configuration files and server variables between servers. Use for: configuration auditing, " .
+                        "ensuring consistency across servers, troubleshooting performance differences, migration verification, " .
+                        "compliance checking, server standardization",
+
+    "pt-deadlock-logger" => "Monitors, logs and helps analyze MySQL deadlocks in real-time. Use for: deadlock detection, " .
+                           "transaction analysis, application debugging, lock contention monitoring, InnoDB lock analysis, " .
+                           "performance troubleshooting",
+
+    "pt-diskstats" => "Advanced I/O monitoring and analysis for MySQL databases. Use for: disk performance analysis, " .
+                      "I/O bottleneck identification, storage troubleshooting, capacity planning, " .
+                      "disk usage optimization, IOPS monitoring, disk fragmentation monitoring",
+
+    "pt-duplicate-key-checker" => "Identifies redundant indexes and foreign keys in MySQL tables. Use for: index optimization, " .
+                                 "storage efficiency, performance tuning, schema optimization, reducing maintenance overhead, " .
+                                 "identifying unnecessary indexes",
+
+    "pt-online-schema-change" => "Performs MySQL schema modifications without downtime. Use for: zero-downtime table alterations, " .
+                                "adding/removing columns, changing indexes, table restructuring, performance optimization, " .
+                                "defrag, defragment, defragmentation, disk space optimization, disk free space management, " .
+                                "constraint modifications, partition management, table reorganization",
+
+    "pt-query-digest" => "Analyzes MySQL queries from logs, processlist, and tcpdump. Use for: query performance analysis, " .
+                         "identifying slow queries, query optimization, workload analysis, capacity planning, " .
+                         "performance trending, bottleneck identification",
+
+    "pt-table-checksum" => "Verifies MySQL replication integrity efficiently. Use for: replication consistency checking, " .
+                           "data verification, corruption detection, slave synchronization verification, " .
+                           "maintaining data integrity, identifying replication errors",
+
+    "pt-table-sync" => "Efficiently synchronizes MySQL tables between servers. Use for: replication repair, " .
+                       "data synchronization, fixing inconsistencies, slave restoration, " .
+                       "maintaining replica consistency, data recovery, table optimization",
+
+    "pt-variable-advisor" => "Analyzes MySQL variables for common problems and optimization opportunities. Use for: " .
+                            "configuration optimization, performance tuning, best practice validation, " .
+                            "security hardening, resource allocation"
 );
+
+# Helper function to normalize search terms
+sub normalize_term {
+    my ($term) = @_;
+    $term = lc($term);
+    # Remove common typos and variations
+    $term =~ s/defragm[ae]ntation/defrag/i;  # Handle variations of defragmentation
+    $term =~ s/fragm[ae]ntation/defrag/i;    # Handle variations without 'de'
+    $term =~ s/optimi[sz]ation/optimize/i;    # Handle optimize variations
+    $term =~ s/replication/replica/i;         # Handle replication variations
+    $term =~ s/slave/replica/i;         # Handle replication variations
+    return $term;
+}
+
+sub print_installation_instructions {
+    print "\n" . "=" x 60 . "\n";
+    print "📥 Installation Options\n";
+    print "=" x 60 . "\n\n";
+
+    # Package Manager Section
+    print "1️⃣  Using Package Manager (Recommended)\n";
+    print "   " . "-" x 40 . "\n";
+    print "   \033[1mDebian/Ubuntu:\033[0m\n";
+    print "   \$ sudo apt update\n";
+    print "   \$ sudo apt install percona-toolkit\n\n";
+
+    print "   \033[1mRHEL/CentOS:\033[0m\n";
+    print "   \$ sudo yum install percona-toolkit\n\n";
+
+    # Manual Download Section
+    print "2️⃣  Manual Download\n";
+    print "   " . "-" x 40 . "\n";
+    print "   \$ wget percona.com/get/[TOOLNAME]\n";
+    print "   \$ chmod +x [TOOLNAME]\n\n";
+
+    # Docker Section
+    print "3️⃣  Using Docker\n";
+    print "   " . "-" x 40 . "\n";
+    print "   \$ docker pull percona/percona-toolkit\n";
+    print "   \$ docker run --rm percona/percona-toolkit [TOOLNAME] --help\n\n";
+
+    # Documentation Link
+    print "📚 Documentation\n";
+    print "   " . "-" x 40 . "\n";
+    print "   • Detailed Installation Guide:\n";
+    print "     \033[4mhttps://docs.percona.com/percona-toolkit/installation.html\033[0m\n";
+    print "   • Man Pages:\n";
+    print "     \033[4mhttps://docs.percona.com/percona-toolkit/\033[0m\n\n";
+}
+
 
 sub show_random_tool {
     my @keys = keys %tools;
     my $random_tool = $keys[rand @keys];
-    print "FYI: The '$random_tool' can be used for: $tools{$random_tool}\n";
+
+    print "\n" . "=" x 60 . "\n";
+    print "💡 Random Tool Suggestion\n";
+    print "=" x 60 . "\n\n";
+
+    # Format tool name with some emphasis
+    print "Tool: \033[1m$random_tool\033[0m\n\n";
+
+    # Split the description into "overview" and "use cases"
+    my $description = $tools{$random_tool};
+    my ($overview, $use_cases) = split /Use for:/, $description;
+
+    # Print the overview
+    print "Overview:\n";
+    print wrap_text($overview, 2) . "\n\n";
+
+    # Print use cases in a structured format
+    print "Use Cases:\n";
+    if ($use_cases) {
+        my @cases = split /,/, $use_cases;
+        foreach my $case (sort @cases) {
+            $case =~ s/^\s+|\s+$//g;  # trim whitespace
+            print "  • $case\n";
+        }
+    }
+    print "\n" . "=" x 60 . "\n";
 }
 
 sub help {
     print "Usage: pt-what <task>\n";
     print "Search for Percona tools that can help with the specified task.\n\n";
+    print "Examples:\n";
+    print "  pt-what replication          # Find tools for replication management\n";
+    print "  pt-what \"performance tuning\" # Find tools for performance optimization\n";
+    print "  pt-what defrag              # Find tools for defragmentation\n\n";
     print "Options:\n";
     print "  task         Task to search for Percona tools for\n";
     print "  -h, --help   Show this help message\n";
     exit;
 }
-
 
 my @tasks = @ARGV or help();
 
@@ -78,13 +159,14 @@ if (!@tasks) {
 }
 
 print "\nPercona tools that may assist you with '@tasks' task:\n";
-print "-------------------------------------------------\n";
+print "-" x 60 . "\n";
 
 my %matching_tools;
 
 foreach my $task (@tasks) {
+    my $normalized_task = normalize_term($task);
     foreach my $tool (keys %tools) {
-        if ($tools{$tool} =~ /$task/i) {
+        if ($tools{$tool} =~ /$task/i || $tools{$tool} =~ /$normalized_task/i) {
             $matching_tools{$tool}++;
         }
     }
@@ -93,14 +175,42 @@ foreach my $task (@tasks) {
 my @sorted_tools = sort {$matching_tools{$b} <=> $matching_tools{$a}} keys %matching_tools;
 
 foreach my $tool (@sorted_tools) {
-    print "* $tool\n";
+    print "* $tool:\n  " . wrap_text($tools{$tool}, 2) . "\n\n";
 }
 
 if(!@sorted_tools) {
-    print "No matching tools found for the task '@tasks'\n\n";
+    print "No matching tools found for the task '@tasks'\n";
+    print "Try searching with similar terms like:\n";
+    my $search_term = $tasks[0];
+    if ($search_term =~ /defragm[ae]nt/i) {
+        print "  - defrag\n  - fragmentation\n  - optimize\n";
+    } elsif ($search_term =~ /optimi[sz]/i) {
+        print "  - optimize\n  - performance\n  - tuning\n";
+    }
+    print "\n";
     &show_random_tool;
 } else {
-    print "\nTo download above tools use the following command:\n";
-    print "wget percona.com/get/[TOOLNAME] && chmod +x [TOOLNAME]\n";
-    print "Install Percona Toolkit: https://docs.percona.com/percona-toolkit/installation.html\n"
+    &print_installation_instructions;
+}
+
+# Helper function to wrap text at 80 characters with proper indentation
+sub wrap_text {
+    my ($text, $indent) = @_;
+    my $width = 78 - $indent;
+    my $indent_str = " " x $indent;
+    my @words = split /\s+/, $text;
+    my @lines;
+    my $line = "";
+
+    foreach my $word (@words) {
+        if (length($line) + length($word) + 1 <= $width) {
+            $line .= ($line eq "" ? "" : " ") . $word;
+        } else {
+            push @lines, $line if $line;
+            $line = $word;
+        }
+    }
+    push @lines, $line if $line;
+
+    return join("\n$indent_str", @lines);
 }
