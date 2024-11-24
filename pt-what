@@ -48,7 +48,23 @@ my %tools = (
 
     "pt-variable-advisor" => "Analyzes MySQL variables for common problems and optimization opportunities. Use for: " .
                             "configuration optimization, performance tuning, best practice validation, " .
-                            "security hardening, resource allocation"
+                            "security hardening, resource allocation",
+
+    "pt-slave-find" => "Finds and reports MySQL replication hierarchy and status. Use for: mapping replication topologies, " .
+                       "finding broken replication chains, discovering master-slave relationships, identifying replication loops, " .
+                       "auditing replication configuration, finding the most lagging slave, network replication mapping, " .
+                       "replication health checks, visualizing complex replication setups",
+
+    "pt-slave-delay" => "Helps maintain a time-delayed MySQL replica. Use for: delayed disaster recovery setup, " .
+                        "maintaining backup slave servers, point-in-time recovery preparation, preventing replication of harmful queries, " .
+                        "creating delayed replicas, time-shifted backup windows, protection against accidental changes, " .
+                        "testing schema changes with time buffer, verifying data changes before they replicate",
+
+    "pt-slave-restart" => "Watches and restarts MySQL replication after errors. Use for: automated slave error recovery, " .
+                          "handling temporary replication failures, skipping problematic statements, maintaining replica uptime, " .
+                          "monitoring slave status, automatic replication healing, continuous replication monitoring, " .
+                          "preventing extended replication downtime, error-resilient replication maintenance"
+
 );
 
 # Helper function to normalize search terms
